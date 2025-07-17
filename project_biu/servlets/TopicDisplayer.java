@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import graph.TopicManagerSingleton;
 import graph.TopicManagerSingleton.TopicManager;
 import graph.Message;
-import graph.Topic;
 
 public class TopicDisplayer implements Servlet {
 
@@ -21,8 +20,6 @@ public class TopicDisplayer implements Servlet {
         String messageStr = params.get("message");
         System.out.println("Topic: " + topicStr);
         System.out.println("Message: " + messageStr);
-
-                
                 
         TopicManager tm=TopicManagerSingleton.get(); // Get the singleton instance of TopicManager
         if (topicStr == null || topicStr.isEmpty()) {
@@ -51,34 +48,75 @@ public class TopicDisplayer implements Servlet {
         ConcurrentHashMap<String, Message> updateLeastValuesMap = tm.getLeastValuesMap();
 
         StringBuilder html = new StringBuilder();
-        html.append("<html><head>");
-        html.append("<meta charset=\"UTF-8\">");
-        html.append("<title>Topics Info</title>");
-        html.append("<style>");
-        html.append("body { font-family: 'Montserrat', Arial, sans-serif; margin: 18px; }");
-        html.append(".row { display: flex; align-items: center; margin-bottom: 22px; }");
-        html.append(".row label { margin-right: 8px; }");
-        html.append(".row input[type=\"file\"] { margin-right: 10px; }");
-        html.append(".row button { margin-left: auto; }");
-        html.append("form { margin-bottom: 24px; }");
-        html.append("label { display: block; margin-bottom: 2px; }");
-        html.append("input[type=\"text\"] { width: 150px; padding: 3px; margin-bottom: 6px; display: block; }");
-        html.append("</style>");
-        html.append("</head><body>");
+        html.append("""
+        <html><head>
+        <meta charset="UTF-8">
+        <title>Topics Info</title>
+        <style>
+            body{
+            font-family:'Montserrat',Arial,sans-serif;
+            margin:18px;
+            color:#333;
+            }
+            h2{
+            color:#1976d2;
+            margin-bottom:14px;
+            font-size:1.1rem;
+            }
+            table{
+            width:100%;
+            border-collapse:collapse;
+            border-radius:10px;
+            overflow:hidden;
+            box-shadow:0 2px 8px #ddd;
+            background:#fff;
+            }
+            thead{
+            background:#e3f2fd;
+            }
+            th,td{
+            padding:10px 14px;
+            text-align:left;
+            }
+            tbody tr:nth-child(even){
+            background:#f9f9f9;
+            }
+            tbody tr:hover{
+            background:#eaf4ff;
+            }
+            .status{
+            margin-bottom:18px;
+            padding:8px 12px;
+            background:#e8f5e9;
+            color:#2e7d32;
+            border:1px solid #c8e6c9;
+            border-radius:6px;
+            font-size:0.9rem;
+            }
+        </style>
+        </head><body>
+        """);
+
+        // small message that shows that the message was published
+        html.append("<div class='status'>Message &quot;")
+            .append(escapeHtml(messageStr))
+            .append("&quot; published to topic <strong>")
+            .append(escapeHtml(topicStr))
+            .append("</strong>.</div>");
+
         html.append("<h2>Topics Info</h2>");
-        html.append("<table border='1' style='width: 50%; border-radius:10px; box-shadow: 0 2px 8px #eee; background: #fff;'>");
-        html.append("<tr style='background:#e3f2fd;'><th>Topic Name</th><th>Last Value</th></tr>");
+        html.append("<table><thead><tr><th>Topic Name</th><th>Last Value</th></tr></thead><tbody>");
 
         for (Map.Entry<String, Message> entry : updateLeastValuesMap.entrySet()) {
             String topicName = entry.getKey();
             Message lastMessage = entry.getValue();
-            html.append("<tr>");
-            html.append("<td>").append(topicName).append("</td>");
-            html.append("<td>").append(lastMessage.asText).append("</td>");
-            html.append("</tr>");
+            html.append("<tr><td>")
+                .append(escapeHtml(topicName))
+                .append("</td><td>")
+                .append(escapeHtml(lastMessage.asText))
+                .append("</td></tr>");
         }
-        html.append("</table>");
-        html.append("</body></html>");
+        html.append("</tbody></table></body></html>");
 
         byte[] content = html.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         String headers = "HTTP/1.1 200 OK\r\n"
@@ -88,8 +126,11 @@ public class TopicDisplayer implements Servlet {
             + "\r\n";
         toClient.write(headers.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         toClient.write(content);
-        
-
+    }
+    
+    // helper to avoid breaking on angle‑brackets
+    private static String escapeHtml(String s){
+        return s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
     }
 
     @Override
