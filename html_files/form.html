@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forms - Config Upload and Publish</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 18px;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+        .row label {
+            margin-right: 8px;
+        }
+        .row input[type="file"] {
+            margin-right: 10px;
+        }
+        .row button {
+            margin-left: auto;
+        }
+        form {
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            margin-bottom: 2px;
+        }
+        input[type="text"] {
+            width: 150px;
+            padding: 3px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        button {
+            width: 60px;
+            padding: 3px 0;
+        }
+        .cool-btn {
+            background: #2196f3;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 10px;
+            font-size: 1rem;
+            font-family: 'Montserrat', Arial, sans-serif;
+            transition: 
+                background 0.25s cubic-bezier(.4,0,.2,1), 
+                box-shadow 0.25s cubic-bezier(.4,0,.2,1), 
+                transform 0.18s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 2px 8px #eeeeee;
+            cursor: pointer;
+            outline: none;
+            margin-top: 8px;
+        }
+        .cool-btn:hover, .cool-btn:focus {
+            background: #1976d2;
+            color: #fff;
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px #b5d1fa;
+        }
+        .help-message {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 60%;
+            background: transparent;
+            color: #333;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 0.60em;
+            padding: 13px 12px 40px 12px;
+            box-shadow: 0 -2px 8px #ececec;
+            text-align: left;
+            letter-spacing: 0.01em;
+        }
+        .help-phone {
+            color: #1976d2;
+            font-weight: bold;
+            letter-spacing: 0.01em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Config Upload Form -->
+    <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <input type="file" id="configFile" name="file" required>
+            <button type="submit">Deploy</button>
+        </div>
+    </form>
+    <!-- Publish Message Form -->
+    <form action="http://localhost:8080/publish" method="get">
+        <label for="topic">Topic name:</label>
+        <input type="text" id="topic" name="topic" required>
+        <label for="message">Message:</label>
+        <input type="text" id="message" name="message" required>
+        <button type="submit" class="cool-btn">Send</button>
+    </form>
+
+    <div class="help-message">
+      For assistance, please contact our Client Support Center at <span class="help-phone">(+972) 542-450-21.</span>
+    </div>
+</body>
+</html>
