@@ -60,11 +60,11 @@ public static RequestInfo parseRequest(BufferedReader reader, InputStream in) th
         }
     }
 
-    // *** STOP HERE for GET *** (unless אתה יודע שיש עוד שורות מיוחדות!)
-    // אם בכל זאת אתה חייב תמיכה בפרמטרים כמו filename="..." אחרי headers, תבדוק:
+    // *** STOP HERE for GET *** (unless you know there are more parameters in the body!)
+    // If not GET, try to read extra parameters from the body (e.g., after headers, like filename="..." etc):
     Map<String, String> extraParams = new HashMap<>();
     if (!"GET".equals(httpCommand)) {
-        reader.mark(4096); // תומך בחזרה אחורה
+        reader.mark(4096); // Mark the current position in the reader
         String peek = reader.readLine();
         if (peek != null && peek.contains("=")) {
             do {
@@ -82,7 +82,7 @@ public static RequestInfo parseRequest(BufferedReader reader, InputStream in) th
     }
     parameters.putAll(extraParams);
 
-    // Content/body (רק אם יש)
+    // Content/body (read if exists)
     byte[] content = new byte[0];
     if (contentLength > 0) {
         content = new byte[contentLength];

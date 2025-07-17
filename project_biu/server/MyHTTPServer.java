@@ -17,23 +17,26 @@ import java.util.concurrent.Executors;
 import static server.RequestParser.parseRequest;
 
 public class MyHTTPServer extends Thread implements HTTPServer{
-    Map<String, Servlet> getMap;
-    Map<String, Servlet> postMap;
-    Map<String, Servlet> deleteMap;
+    // Maps for HTTP method to URI to Servlet
+    Map<String, Servlet> getMap, postMap, deleteMap;
+    // Server running flag
     boolean run;
+    // Thread pool for handling client requests
     ExecutorService pool;
+    // Main server socket
     ServerSocket serverSocket;
 
     public MyHTTPServer(int port,int nThreads) throws IOException {
+        // Initialize servlet maps and thread pool
         getMap = new ConcurrentHashMap<>();
         postMap = new ConcurrentHashMap<>();
         deleteMap = new ConcurrentHashMap<>();
         run = false;
         pool = Executors.newFixedThreadPool(nThreads);
         serverSocket = new ServerSocket(port);
-
     }
 
+    // Register a servlet for a specific HTTP method and URI
     public void addServlet(String httpCommanmd, String uri, Servlet s){
         switch (httpCommanmd) {
             case "GET":
@@ -50,6 +53,7 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     }
 
+    // Remove a servlet for a specific HTTP method and URI
     public void removeServlet(String httpCommanmd, String uri){
         switch (httpCommanmd) {
             case "GET":
@@ -66,26 +70,22 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     }
 
+    // Main server loop: accept and handle client connections
     public void run(){
         this.run = true;
         try {
-            // As long as the server is not instructed to shut down,
-            // it will wait (again) for the client for one second.
+            // Set timeout for accept to allow periodic shutdown check
             serverSocket.setSoTimeout(1000);
             while (this.run) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    // If got to here it means that new client joined.
-                    // A client has connected and therefore its handling
-                    // will be performed as a task of the pool thread.
-
+                    // Handle each client in a thread pool task
                     pool.submit(() -> {
                         System.out.println("New client connected: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
                         try (
                                 InputStream in = clientSocket.getInputStream();
                                 BufferedReader fromClient = new BufferedReader(new InputStreamReader(in));
                                 OutputStream toClient = clientSocket.getOutputStream();
-
                         ) {
                             System.out.println("Ori");
                             RequestParser.RequestInfo info = parseRequest(fromClient, in);
@@ -104,7 +104,7 @@ public class MyHTTPServer extends Thread implements HTTPServer{
                                     return;
                                 }
                             }
-
+                            // Handle the request or return 404
                             if (s != null) {
                                 s.handle(info, toClient);
                                 toClient.flush();
@@ -113,18 +113,15 @@ public class MyHTTPServer extends Thread implements HTTPServer{
                                 toClient.write(errorResponse.getBytes());
                                 toClient.flush();
                             }
-
                             clientSocket.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     });
-
                 } catch (SocketTimeoutException e) {}
             }
         } catch (IOException e) {}
-
-        // When the while end it meas the server ended so we need to close the sockets:
+        // Shutdown: close thread pool and server socket
         finally {
             try {
                 pool.shutdown();
@@ -133,12 +130,14 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     }
 
+    // Signal the server to stop
     public void close(){
         this.run = false;
         /*
+        // Optionally close all servlets
         for (Servlet s : getMap.values()){
             s.close();
-        }""""""
+        }
         for (Servlet s : postMap.values()){
             s.close();
         }
@@ -146,14 +145,12 @@ public class MyHTTPServer extends Thread implements HTTPServer{
             s.close();
         }
         */
-
     }
 
-
+    // Find the servlet with the longest matching URI prefix
     private static Servlet getLongestMatchingServlet(Map<String, Servlet> map, String path) {
         Servlet result = null;
         int longest = -1;
-
         for (String key : map.keySet()) {
             if (path.startsWith(key) && key.length() > longest) {
                 longest = key.length();

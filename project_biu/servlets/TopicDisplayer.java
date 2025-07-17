@@ -13,16 +13,17 @@ public class TopicDisplayer implements Servlet {
 
     @Override
     public void handle(RequestInfo ri, OutputStream toClient) throws IOException {
-        // Implementation for handling HTML loading requests
-        // This could involve reading an HTML file and writing it to the output stream
+        // Extract parameters from the request
         Map<String, String> params = ri.getParameters();
         String topicStr = params.get("topic");
         String messageStr = params.get("message");
         System.out.println("Topic: " + topicStr);
         System.out.println("Message: " + messageStr);
                 
-        TopicManager tm=TopicManagerSingleton.get(); // Get the singleton instance of TopicManager
-        if (topicStr == null || topicStr.isEmpty()) {
+        // Get the singleton TopicManager instance
+        TopicManager tm=TopicManagerSingleton.get();
+        // Validate topic and message parameters
+        if (topicStr == null || topicStr.isEmpty() || messageStr == null || messageStr.isEmpty()) {
             String error = "<html><body><h1>Topic not specified</h1></body></html>";
             String headers = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: " + error.getBytes().length + "\r\n\r\n";
             toClient.write(headers.getBytes());
@@ -43,10 +44,11 @@ public class TopicDisplayer implements Servlet {
         Message msg = new Message(messageStr);
         tm.getTopic(topicStr).publish(msg);
                 
-        // Add the message to the least values map
-        tm.addLeastValue(topicStr, msg); // Add the message to the least values map
+        // Update the least values map with the new message
+        tm.addLeastValue(topicStr, msg);
         ConcurrentHashMap<String, Message> updateLeastValuesMap = tm.getLeastValuesMap();
 
+        // Build the HTML response
         StringBuilder html = new StringBuilder();
         html.append("""
         <html><head>
@@ -97,7 +99,7 @@ public class TopicDisplayer implements Servlet {
         </head><body>
         """);
 
-        // small message that shows that the message was published
+        // Show a status message for the published message
         html.append("<div class='status'>Message &quot;")
             .append(escapeHtml(messageStr))
             .append("&quot; published to topic <strong>")
@@ -107,6 +109,7 @@ public class TopicDisplayer implements Servlet {
         html.append("<h2>Topics Info</h2>");
         html.append("<table><thead><tr><th>Topic Name</th><th>Last Value</th></tr></thead><tbody>");
 
+        // List all topics and their last message
         for (Map.Entry<String, Message> entry : updateLeastValuesMap.entrySet()) {
             String topicName = entry.getKey();
             Message lastMessage = entry.getValue();
@@ -118,6 +121,7 @@ public class TopicDisplayer implements Servlet {
         }
         html.append("</tbody></table></body></html>");
 
+        // Build and send the HTML response
         byte[] content = html.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         String headers = "HTTP/1.1 200 OK\r\n"
             + "Content-Type: text/html; charset=UTF-8\r\n"
@@ -128,7 +132,7 @@ public class TopicDisplayer implements Servlet {
         toClient.write(content);
     }
     
-    // helper to avoid breaking on angle‑brackets
+    // Helper to escape HTML special characters
     private static String escapeHtml(String s){
         return s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
     }
