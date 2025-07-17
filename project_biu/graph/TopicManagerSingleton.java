@@ -8,9 +8,11 @@ public class TopicManagerSingleton {
 
     public static class TopicManager{
         private ConcurrentHashMap<String, Topic> topicsMap;
+        private ConcurrentHashMap<String, Message> leastValuesMap; //
 
         private TopicManager(){
             this.topicsMap = new ConcurrentHashMap<>();
+            this.leastValuesMap = new ConcurrentHashMap<>();
         }
 
         public Topic getTopic(String topicName){ // Need to be threads safety!
@@ -19,6 +21,14 @@ public class TopicManagerSingleton {
 
         public Collection<Topic> getTopics(){
             return new ArrayList<>(topicsMap.values());
+        }
+
+        public ConcurrentHashMap<String, Message> getLeastValuesMap(){ //
+            return this.leastValuesMap;
+        }
+
+        public void addLeastValue(String topicName, Message message){ //
+            this.leastValuesMap.put(topicName, message);
         }
 
         public void clear(){

@@ -2,6 +2,7 @@ package server;
 import servlets.Servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -79,16 +80,21 @@ public class MyHTTPServer extends Thread implements HTTPServer{
                     // will be performed as a task of the pool thread.
 
                     pool.submit(() -> {
+                        System.out.println("New client connected: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
                         try (
-                                BufferedReader fromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                                OutputStream toClient = clientSocket.getOutputStream()
+                                InputStream in = clientSocket.getInputStream();
+                                BufferedReader fromClient = new BufferedReader(new InputStreamReader(in));
+                                OutputStream toClient = clientSocket.getOutputStream();
+
                         ) {
-                            RequestParser.RequestInfo info = parseRequest(fromClient);
+                            System.out.println("Ori");
+                            RequestParser.RequestInfo info = parseRequest(fromClient, in);
+                            System.out.println("Request info: " + info);
                             if (info == null) {
                                 clientSocket.close();
                                 return;
                             }
-
+                            System.out.println("Request info: " + info);
                             Servlet s = null;
                             switch (info.getHttpCommand()) {
                                 case "GET":    s = getLongestMatchingServlet(getMap, info.getUri());    break;

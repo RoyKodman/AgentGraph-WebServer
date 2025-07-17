@@ -2,93 +2,110 @@ package server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequestParser {
 
-    public static RequestInfo parseRequest(BufferedReader reader) throws IOException {
-        // 1. Read the request line
-        String requestLine = reader.readLine();
-        if (requestLine == null || requestLine.isEmpty()) {
-            return null;
+public static RequestInfo parseRequest(BufferedReader reader, InputStream in) throws IOException {
+    // 1. Read request line
+    String requestLine = reader.readLine();
+    if (requestLine == null || requestLine.isEmpty()) {
+        return null;
+    }
+    String[] requestParts = requestLine.split(" ");
+    String httpCommand = requestParts[0];
+    String fullUri = requestParts[1];
+
+    // Parse URI
+    String uri;
+    Map<String, String> parameters = new HashMap<>();
+    int idx = fullUri.indexOf('?');
+    if (idx >= 0) {
+        uri = fullUri.substring(0, idx);
+        String query = fullUri.substring(idx + 1);
+        for (String param : query.split("&")) {
+            if (param.isEmpty()) continue;
+            String[] pair = param.split("=", 2);
+            String key = pair[0];
+            String value = pair.length > 1 ? pair[1] : "";
+            parameters.put(key, value);
         }
+    } else {
+        uri = fullUri;
+    }
+    String[] uriSegments = Arrays.stream(uri.split("/"))
+            .filter(segment -> !segment.isEmpty())
+            .toArray(String[]::new);
 
-        String[] requestParts = requestLine.split(" ");
-        String httpCommand = requestParts[0];
-        String fullUri = requestParts[1];
-
-        // 2. Parse URI segments and parameters
-        String uri;
-        Map<String, String> parameters = new HashMap<>();
-        int idx = fullUri.indexOf('?');
-        if (idx >= 0) {
-            uri = fullUri.substring(0, idx);
-            String query = fullUri.substring(idx + 1);
-            for (String param : query.split("&")) {
-                if (param.isEmpty()) continue;
-                String[] pair = param.split("=", 2);
-                String key = pair[0];
-                String value = pair.length > 1 ? pair[1] : "";
-                parameters.put(key, value);
-            }
-        } else {
-            uri = fullUri;
-        }
-        String[] uriSegments = Arrays.stream(uri.split("/"))
-                .filter(segment -> !segment.isEmpty())
-                .toArray(String[]::new);
-
-        // 3. Headers
-        Map<String, String> headers = new HashMap<>();
-        String line;
-        int contentLength = 0;
-        while ((line = reader.readLine()) != null && !line.isEmpty()) {
-            int sep = line.indexOf(':');
-            if (sep > 0) {
-                String key = line.substring(0, sep).trim();
-                String value = line.substring(sep + 1).trim();
-                headers.put(key, value);
-                if (key.equalsIgnoreCase("Content-Length")) {
-                    try {
-                        contentLength = Integer.parseInt(value);
-                    } catch (NumberFormatException e) {
-                        contentLength = 0;
-                    }
+    // Headers
+    Map<String, String> headers = new HashMap<>();
+    String line;
+    int contentLength = 0;
+    while ((line = reader.readLine()) != null && !line.isEmpty()) {
+        int sep = line.indexOf(':');
+        if (sep > 0) {
+            String key = line.substring(0, sep).trim();
+            String value = line.substring(sep + 1).trim();
+            headers.put(key, value);
+            if (key.equalsIgnoreCase("Content-Length")) {
+                try {
+                    contentLength = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    contentLength = 0;
                 }
             }
         }
+    }
 
-        // 4. Extra parameters (do not strip quotes!)
-        while ((line = reader.readLine()) != null && !line.isEmpty()) {
-            int eq = line.indexOf('=');
-            if (eq > 0) {
-                String key = line.substring(0, eq).trim();
-                String value = line.substring(eq + 1); // DO NOT REMOVE QUOTES
-                parameters.put(key, value);
-            }
+    // *** STOP HERE for GET *** (unless אתה יודע שיש עוד שורות מיוחדות!)
+    // אם בכל זאת אתה חייב תמיכה בפרמטרים כמו filename="..." אחרי headers, תבדוק:
+    Map<String, String> extraParams = new HashMap<>();
+    if (!"GET".equals(httpCommand)) {
+        reader.mark(4096); // תומך בחזרה אחורה
+        String peek = reader.readLine();
+        if (peek != null && peek.contains("=")) {
+            do {
+                int eq = peek.indexOf('=');
+                if (eq > 0) {
+                    String key = peek.substring(0, eq).trim();
+                    String value = peek.substring(eq + 1);
+                    extraParams.put(key, value);
+                }
+                peek = reader.readLine();
+            } while (peek != null && !peek.isEmpty());
+        } else {
+            reader.reset();
         }
+    }
+    parameters.putAll(extraParams);
 
-        // 5. Read content until next blank line or end of input
-        StringBuilder contentBuilder = new StringBuilder();
-        while ((line = reader.readLine()) != null && !line.isEmpty()) {
-            contentBuilder.append(line).append('\n');
+    // Content/body (רק אם יש)
+    byte[] content = new byte[0];
+    if (contentLength > 0) {
+        content = new byte[contentLength];
+        int read = 0;
+        while (read < contentLength) {
+            int n = in.read(content, read, contentLength - read);
+            if (n == -1) break;
+            read += n;
         }
-        byte[] content = contentBuilder.toString().getBytes();
+    }
 
-        return new RequestInfo(
-                httpCommand,
-                fullUri,
-                uriSegments,
-                parameters,
-                content
-        );
+    return new RequestInfo(
+            httpCommand,
+            fullUri,
+            uriSegments,
+            parameters,
+            content
+    );
     }
 
 
-	
-	// RequestInfo given internal class
+
+    // RequestInfo inner class
     public static class RequestInfo {
         private final String httpCommand;
         private final String uri;
