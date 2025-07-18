@@ -111,6 +111,60 @@
       font-size: 0.9em;
       margin-top: 10px;
     }
+
+    .info-float {
+      position: absolute;
+      left: 19px;
+      top: 15px;
+      z-index: 10;
+    }
+    .info-icon {
+      display: inline-block;
+      background: #fff;
+      color: #1976d2;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      font-size: 1.0em;
+      text-align: center;
+      line-height: 25px;
+      box-shadow: 0 2px 5px #eee;
+      border: 2px solid #90caf9;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      text-align: center;
+    }
+    .info-icon:hover, .info-icon:focus {
+      box-shadow: 0 2px 8px #1976d255;
+      background: #e3f2fd;
+    }
+    .info-panel {
+      display: none;
+      position: absolute;
+      left: 30px;
+      top: -6px;
+      width: 200px;
+      padding: 13px 15px;
+      background: #fff;
+      color: #222;
+      border-radius: 12px;
+      box-shadow: 0 2px 14px #2196f366;
+      border: 1px solid #90caf9;
+      font-size: 0.97em;
+      font-family: 'Montserrat', Arial, sans-serif;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .info-icon:hover + .info-panel,
+    .info-icon:focus + .info-panel {
+      display: block;
+      pointer-events: auto;
+      opacity: 1;
+    }
+
   </style>
   <script>
     function showSuccessMessage() {
@@ -121,11 +175,23 @@
   </script>
 </head>
 <body>
+  <div class="info-float">
+    <div class="info-icon" tabindex="0">i</div>
+      <div class="info-panel">
+        <strong>Instructions:</strong><br>
+        • Use the "Deploy" form to upload config files.<br>
+        • Use "Publish Message" to send a message to a topic.<br>
+        • See the animated graph example below.<br>
+        • For more, check the help link at the bottom.<br>
+        <em>Hover or click this icon to hide/show these instructions.</em>
+      </div>
+  </div>
+    <br>
     <h2>Deploy Configuration</h2>
-    <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data" onsubmit="showSuccessMessage()">
+    <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data" target="graphFrame" onsubmit="return showSuccessMessage()">
       <div class="form-group">
         <label for="configFile">Choose config file:</label>
-        <input type="file" id="configFile" name="file" required>
+        <input type="file" id="configFile" name="configFile" accept=".conf">
       </div>
       <div style="text-align: center;">
         <button type="submit" class="cool-btn">Deploy</button>
@@ -148,6 +214,86 @@
       <button type="reset" class="reset-btn">Reset</button>
     </div>
   </form>
+
+
+<div style="margin-top: 35px; text-align: auto;">
+  <h2 style="color:#1976d2;font-size:1em;">Animated Blue Graph Example</h2>
+  <svg id="graph" width="340" height="190"></svg>
+</div>
+<style>
+  .node {
+    fill: #2196f3;
+    stroke: #1565c0;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 7px #90caf9);
+    transition: r 0.2s;
+  }
+  .node:hover {
+    r: 15;
+    filter: drop-shadow(0 0 12px #1976d2);
+  }
+  .edge {
+    stroke: #1565c0;
+    stroke-width: 3;
+    opacity: 0.67;
+    filter: drop-shadow(0 0 5px #90caf9);
+    stroke-dasharray: 12 5;
+    animation: dashmove 2.3s linear infinite;
+  }
+  @keyframes dashmove {
+    100% { stroke-dashoffset: -34; }
+  }
+  .label {
+    fill: #222;
+    font-size: 16px;
+    font-family: 'Montserrat', Arial, sans-serif;
+    text-anchor: middle;
+    pointer-events: none;
+  }
+</style>
+<script>
+  // Data for a nicer layout with 3 nodes in a triangle
+  const nodes = [
+    {id: 0, x: 40, y: 75, label: 'A'},
+    {id: 1, x: 120, y: 30,  label: 'B'},
+    {id: 2, x: 200, y: 75, label: 'C'}
+  ];
+  const edges = [
+    {source: 0, target: 1},
+    {source: 1, target: 2},
+    {source: 2, target: 0}
+  ];
+  const svg = document.getElementById('graph');
+  // Draw edges
+  edges.forEach((e) => {
+    let src = nodes[e.source], tgt = nodes[e.target];
+    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", src.x);
+    line.setAttribute("y1", src.y);
+    line.setAttribute("x2", tgt.x);
+    line.setAttribute("y2", tgt.y);
+    line.setAttribute("class", "edge");
+    svg.appendChild(line);
+  });
+  // Draw nodes and labels
+  nodes.forEach((n) => {
+    let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", n.x);
+    circle.setAttribute("cy", n.y);
+    circle.setAttribute("r", 15);
+    circle.setAttribute("class", "node");
+    svg.appendChild(circle);
+
+    let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", n.x);
+    text.setAttribute("y", n.y + 5);
+    text.setAttribute("class", "label");
+    text.textContent = n.label;
+    svg.appendChild(text);
+  });
+</script>
+  
+
 
   <div class="help-message">
     Feel free to check the GitHub repository of the project:<br>

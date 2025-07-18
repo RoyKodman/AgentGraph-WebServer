@@ -19,6 +19,10 @@ public class TopicManagerSingleton {
         }
 
         // Get or create a Topic by name
+        public boolean hasTopic(String topicName){
+            return this.topicsMap.containsKey(topicName);
+        }
+
         public Topic getTopic(String topicName){
             return this.topicsMap.computeIfAbsent(topicName, Topic::new);
         }

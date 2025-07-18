@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import server.RequestParser.RequestInfo;
+
 import static server.RequestParser.parseRequest;
 
 public class MyHTTPServer extends Thread implements HTTPServer{
@@ -70,8 +72,68 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     }
 
+    @Override
+    public void run() {
+        run = true;
+        try {
+            serverSocket.setSoTimeout(1000);
+            while (run) {
+                try {
+                    Socket clientSocket = serverSocket.accept();
+                    pool.submit(() -> handleClient(clientSocket));
+                } catch (SocketTimeoutException e) {
+                    // timeout every second to check `running`
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pool.shutdown();
+            try {
+                serverSocket.close();
+            } catch (IOException ignored) {}
+        }
+    }
+
+    private void handleClient(Socket clientSocket) {
+        System.out.println("New client connected: " + clientSocket.getRemoteSocketAddress());
+
+        try (
+            InputStream in        = clientSocket.getInputStream();
+            OutputStream toClient = clientSocket.getOutputStream();
+        ) {
+            System.out.println("Handling client request...");
+            // Only use InputStream for parsing!
+            RequestInfo info = RequestParser.parseRequest(in);
+            if (info == null) {
+                clientSocket.close();
+                return;
+            }
+
+            Servlet servlet = null;
+            switch (info.getHttpCommand()) {
+                case "GET":    servlet = getLongestMatchingServlet(getMap, info.getUri());    break;
+                case "POST":   servlet = getLongestMatchingServlet(postMap, info.getUri());   System.out.println(servlet); break;
+                case "DELETE": servlet = getLongestMatchingServlet(deleteMap, info.getUri()); break;
+            }
+
+            if (servlet != null) {
+                servlet.handle(info, toClient);
+            } else {
+                toClient.write("HTTP/1.1 404 Not Found\r\n\r\n".getBytes());
+            }
+            toClient.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException ignored) {}
+        }
+    }
+
     // Main server loop: accept and handle client connections
-    public void run(){
+    /*public void run(){
         this.run = true;
         try {
             // Set timeout for accept to allow periodic shutdown check
@@ -128,7 +190,7 @@ public class MyHTTPServer extends Thread implements HTTPServer{
                 serverSocket.close();
             } catch (IOException e) {}
         }
-    }
+    } */
 
     // Signal the server to stop
     public void close(){

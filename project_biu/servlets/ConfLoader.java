@@ -1,20 +1,98 @@
 package servlets;
+
 import server.RequestParser.RequestInfo;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import configs.GenericConfig;
+import graph.Graph;
+import graph.TopicManagerSingleton;
+import graph.TopicManagerSingleton.TopicManager;
+import views.HtmlGraphWriter;
 
 public class ConfLoader implements Servlet {
 
     @Override
     public void handle(RequestInfo ri, OutputStream toClient) throws IOException {
-        // Implementation for handling HTML loading requests
-        // This could involve reading an HTML file and writing it to the output stream
+        String contentType = ri.getHeader("Content-Type");
+        byte[] body = ri.getContent();
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            try {
+                UploadFile upload = parseMultipartFile(body, contentType);
+                Path dir = Paths.get("config_files");
+                if (Files.notExists(dir)) {
+                Files.createDirectories(dir);
+                }
+                Path target = dir.resolve(upload.filename);
+                Files.write(target, upload.content);
+                System.out.println("File uploaded: " + upload.filename);
 
+
+                TopicManager tm=TopicManagerSingleton.get();
+                tm.clear();
+
+                GenericConfig gc=new GenericConfig();
+                gc.setConfFile("config_files/" + upload.filename); // change to the exact loaction where you put the file.
+                gc.create();  
+                System.out.println("Configuration created ");
+                Graph g=new Graph();
+                g.createFromTopics();
+                System.out.println("Graph nodes: " + g.size());
+                System.out.println("Graph created from topics");
+                String headers = "HTTP/1.1 200 OK\r\n"
+                    + "Content-Type: text/html; charset=UTF-8\r\n"
+                    + "Connection: close\r\n\r\n";
+                toClient.write(headers.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+                HtmlGraphWriter.write(g, new PrintWriter(toClient));
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+      
     }
 
     @Override
-    public void close() throws IOException {
-        // Clean up resources if necessary
+    public void close() throws IOException {}
+
+    public static class UploadFile {
+        public String filename;
+        public byte[] content;
     }
-    
+
+    private static UploadFile parseMultipartFile(byte[] body, String contentType) throws Exception {
+        int idx = contentType.indexOf("boundary=");
+        if (idx < 0) throw new Exception("Boundary not found");
+        String boundary = contentType.substring(idx + "boundary=".length());
+        if (!boundary.startsWith("--")) boundary = "--" + boundary;
+        boundary = "--" + boundary;
+        System.out.println("DEBUG: Boundary: [" + boundary + "]");
+        String bodyStr = new String(body, java.nio.charset.StandardCharsets.ISO_8859_1);
+        System.out.println("DEBUG: First 400 of bodyStr: [" + bodyStr.substring(0, Math.min(400, bodyStr.length())) + "]");
+
+        int partStart = bodyStr.indexOf(boundary);
+        if (partStart < 0) throw new Exception("Boundary not found in body");
+        int dispIdx = bodyStr.indexOf("Content-Disposition", partStart);
+        int filenameIdx = bodyStr.indexOf("filename=\"", dispIdx);
+        int filenameEnd = bodyStr.indexOf("\"", filenameIdx + 10);
+        String filename = bodyStr.substring(filenameIdx + 10, filenameEnd);
+
+        int doubleNewline = bodyStr.indexOf("\r\n\r\n", filenameEnd);
+        int contentStart = doubleNewline + 4;
+        int partEnd = bodyStr.indexOf(boundary, contentStart) - 2;
+
+        byte[] fileContent = java.util.Arrays.copyOfRange(body, contentStart, partEnd);
+
+        UploadFile upload = new UploadFile();
+        upload.filename = filename;
+        upload.content = fileContent;
+        return upload;
+    }
 }

@@ -19,7 +19,7 @@ public class GenericConfig implements Config{
     int agentsCap = 100;
     List<String> lines; //
 
-    void setConfFile(String confFileLocation){
+    public void setConfFile(String confFileLocation){
         this.confFileLocation = confFileLocation;
     }
 

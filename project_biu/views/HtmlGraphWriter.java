@@ -15,7 +15,7 @@ public final class HtmlGraphWriter {
     // Write a full <html> document
     public static void write(Graph graph, Writer out) throws IOException {
         Map<Node, Point> coords = LayoutEngine.compute(graph);
-
+        System.out.println("Graph nodes: " + graph.size());
         out.write("""
                   <!DOCTYPE html>
                   <html lang="en">

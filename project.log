@@ -1,0 +1,221 @@
+Server started on port 8080
+New client connected: /[0:0:0:0:0:0:0:1]:61789
+New client connected: /[0:0:0:0:0:0:0:1]:61790
+Handling client request...
+Handling client request...
+Requested file: index.html
+html_files/index.html
+Loading file: html_files/index.html
+New client connected: /[0:0:0:0:0:0:0:1]:61791
+Handling client request...
+New client connected: /[0:0:0:0:0:0:0:1]:61792
+Handling client request...
+Requested file: form.html
+html_files/form.html
+Loading file: html_files/form.html
+Requested file: temp.html
+html_files/temp.html
+Loading file: html_files/temp.html
+Requested file: graph.html
+html_files/graph.html
+Loading file: html_files/graph.html
+New client connected: /[0:0:0:0:0:0:0:1]:61793
+Handling client request...
+New client connected: /[0:0:0:0:0:0:0:1]:61805
+Handling client request...
+DEBUG: RequestParser read 247 bytes (should match Content-Length: 247)
+DEBUG: First 80 chars: ------WebKitFormBoundaryk1tr2Y74AzKPe6pL
+Content-Disposition: form-data; name="
+servlets.ConfLoader@56812dcd
+DEBUG: Boundary: [------WebKitFormBoundaryk1tr2Y74AzKPe6pL]
+DEBUG: First 400 of bodyStr: [------WebKitFormBoundaryk1tr2Y74AzKPe6pL
+Content-Disposition: form-data; name="configFile"; filename="ori.conf"
+Content-Type: application/octet-stream
+
+graph.PlusAgent
+A,B
+C
+graph.IncAgent
+C
+D
+------WebKitFormBoundaryk1tr2Y74AzKPe6pL--
+]
+File uploaded: ori.conf
+Configuration created 
+Graph nodes: 6
+Graph created from topics
+Graph nodes: 6
+New client connected: /[0:0:0:0:0:0:0:1]:61806
+Handling client request...
+Topic: s
+Message: s
+done
+Server started on port 8080
+New client connected: /[0:0:0:0:0:0:0:1]:61835
+New client connected: /[0:0:0:0:0:0:0:1]:61834
+Handling client request...
+Handling client request...
+Requested file: index.html
+html_files/index.html
+Loading file: html_files/index.html
+New client connected: /[0:0:0:0:0:0:0:1]:61836
+Handling client request...
+New client connected: /[0:0:0:0:0:0:0:1]:61837
+Handling client request...
+Requested file: form.html
+html_files/form.html
+Loading file: html_files/form.html
+Requested file: temp.html
+html_files/temp.html
+Loading file: html_files/temp.html
+Requested file: graph.html
+html_files/graph.html
+Loading file: html_files/graph.html
+New client connected: /[0:0:0:0:0:0:0:1]:61839
+Handling client request...
+Topic: d
+Message: 3
+done
+Server started on port 8080
+New client connected: /[0:0:0:0:0:0:0:1]:61912
+New client connected: /[0:0:0:0:0:0:0:1]:61913
+Handling client request...
+Handling client request...
+Requested file: index.html
+html_files/index.html
+Loading file: html_files/index.html
+Requested file: form.html
+html_files/form.html
+Loading file: html_files/form.html
+New client connected: /[0:0:0:0:0:0:0:1]:61914
+Handling client request...
+New client connected: /[0:0:0:0:0:0:0:1]:61915
+Handling client request...
+Requested file: temp.html
+Requested file: graph.html
+html_files/temp.html
+Loading file: html_files/temp.html
+html_files/graph.html
+Loading file: html_files/graph.html
+New client connected: /[0:0:0:0:0:0:0:1]:61916
+Handling client request...
+Topic: a
+Message: 5
+New client connected: /[0:0:0:0:0:0:0:1]:61918
+Handling client request...
+DEBUG: RequestParser read 247 bytes (should match Content-Length: 247)
+DEBUG: First 80 chars: ------WebKitFormBoundaryBsL7X0M7qvCLsBu1
+Content-Disposition: form-data; name="
+servlets.ConfLoader@22b82ca7
+DEBUG: Boundary: [------WebKitFormBoundaryBsL7X0M7qvCLsBu1]
+DEBUG: First 400 of bodyStr: [------WebKitFormBoundaryBsL7X0M7qvCLsBu1
+Content-Disposition: form-data; name="configFile"; filename="ori.conf"
+Content-Type: application/octet-stream
+
+graph.PlusAgent
+A,B
+C
+graph.IncAgent
+C
+D
+------WebKitFormBoundaryBsL7X0M7qvCLsBu1--
+]
+File uploaded: ori.conf
+Configuration created 
+Graph nodes: 6
+Graph created from topics
+Graph nodes: 6
+New client connected: /[0:0:0:0:0:0:0:1]:61919
+Handling client request...
+Topic: b
+Message: 5
+done
+Server started on port 8080
+New client connected: /[0:0:0:0:0:0:0:1]:62006
+New client connected: /[0:0:0:0:0:0:0:1]:62005
+Handling client request...
+Handling client request...
+Requested file: index.html
+html_files/index.html
+Loading file: html_files/index.html
+New client connected: /[0:0:0:0:0:0:0:1]:62007
+Handling client request...
+New client connected: /[0:0:0:0:0:0:0:1]:62008
+Handling client request...
+Requested file: graph.html
+html_files/graph.html
+Loading file: html_files/graph.html
+Requested file: form.html
+html_files/form.html
+Loading file: html_files/form.html
+Requested file: temp.html
+html_files/temp.html
+Loading file: html_files/temp.html
+New client connected: /[0:0:0:0:0:0:0:1]:62011
+Handling client request...
+done
+Server started on port 8080
+New client connected: /[0:0:0:0:0:0:0:1]:62056
+New client connected: /[0:0:0:0:0:0:0:1]:62057
+Handling client request...
+Handling client request...
+Requested file: index.html
+html_files/index.html
+Loading file: html_files/index.html
+New client connected: /[0:0:0:0:0:0:0:1]:62058
+Handling client request...
+Requested file: form.html
+html_files/form.html
+Loading file: html_files/form.html
+New client connected: /[0:0:0:0:0:0:0:1]:62059
+Handling client request...
+Requested file: graph.html
+Requested file: temp.html
+html_files/temp.html
+Loading file: html_files/temp.html
+html_files/graph.html
+Loading file: html_files/graph.html
+New client connected: /[0:0:0:0:0:0:0:1]:62060
+Handling client request...
+Topic: d
+Message: 5
+New client connected: /[0:0:0:0:0:0:0:1]:62063
+Handling client request...
+Topic: d
+Message: 5
+New client connected: /[0:0:0:0:0:0:0:1]:62077
+Handling client request...
+DEBUG: RequestParser read 247 bytes (should match Content-Length: 247)
+DEBUG: First 80 chars: ------WebKitFormBoundary04WAk36nNkNLWIqf
+Content-Disposition: form-data; name="
+servlets.ConfLoader@686d6385
+DEBUG: Boundary: [------WebKitFormBoundary04WAk36nNkNLWIqf]
+DEBUG: First 400 of bodyStr: [------WebKitFormBoundary04WAk36nNkNLWIqf
+Content-Disposition: form-data; name="configFile"; filename="ori.conf"
+Content-Type: application/octet-stream
+
+graph.PlusAgent
+A,B
+C
+graph.IncAgent
+C
+D
+------WebKitFormBoundary04WAk36nNkNLWIqf--
+]
+File uploaded: ori.conf
+Configuration created 
+Graph nodes: 6
+Graph created from topics
+Graph nodes: 6
+New client connected: /[0:0:0:0:0:0:0:1]:62081
+Handling client request...
+Topic: A
+Message: 5
+New client connected: /[0:0:0:0:0:0:0:1]:62082
+Handling client request...
+Topic: B
+Message: 5
+New client connected: /[0:0:0:0:0:0:0:1]:62083
+Handling client request...
+Topic: F
+Message: 5
