@@ -23,7 +23,7 @@ public class SigmoidAgent implements Agent{
 
     @Override
     public String getName() {
-        return "IncAgent";
+        return "SigmoidAgent";
     }
 
     @Override

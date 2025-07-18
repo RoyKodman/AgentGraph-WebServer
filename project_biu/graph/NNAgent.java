@@ -33,7 +33,7 @@ public class NNAgent implements Agent{
 
     @Override
     public String getName() {
-        return "PlusAgent";
+        return "NNAgent";
     }
 
     @Override

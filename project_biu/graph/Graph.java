@@ -1,7 +1,6 @@
 package graph;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import graph.TopicManagerSingleton.TopicManager;
 
@@ -11,12 +10,13 @@ public class Graph extends ArrayList<Node>{
     // and creat it otherwise.
     private Node getNodeAgent(Agent a) {
         for (Node n : this){
-            if (Objects.equals(n.getName(), "A" + a.getName())){
+            if (n.getAgent() == a){
                 return n;
             }
         }
         // If he got here it means that there isnt a node for this agent.
         Node newAgentNode = new Node("A" + a.getName());
+        newAgentNode.setAgent(a);
         this.add(newAgentNode);
         return newAgentNode;
     };
@@ -50,7 +50,5 @@ public class Graph extends ArrayList<Node>{
             }
 
         }
-    }    
-
-    
+    }
 }

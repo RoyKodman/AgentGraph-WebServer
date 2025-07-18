@@ -1,123 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Computation Graph Preview</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    h2 {
-      margin: 1rem 0 0.5rem;
-      color: #333;
-    }
-    svg {
-      border: 1px solid #ccc;
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .topic {
-      fill: #c8e6c9;
-      stroke: #2e7d32;
-      stroke-width: 2;
-    }
-    .agent {
-      fill: #bbdefb;
-      stroke: #1565c0;
-      stroke-width: 2;
-    }
-    .label {
-      text-anchor: middle;
-      dominant-baseline: middle;
-      font-size: 14px;
-      pointer-events: none;
-    }
-    .edge {
-      stroke: #555;
-      stroke-width: 2;
-      marker-end: url(#arrow);
-    }
-    .note {
-      font-size: 0.9rem;
-      color: #555;
-      margin: 0.5rem 1rem 1.5rem;
-      max-width: 800px;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Computation Graph</title>
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f5f0 0%, #ede7e0 50%, #f0ede8 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .header h2 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ccc, #aaa);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: not-allowed;
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .info {
+            color: #666;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .placeholder-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .placeholder-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3, #FF5722);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .icon-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+        
+        .graph-icon {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .node {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .node:nth-child(2) { animation-delay: -1s; }
+        .node:nth-child(3) { animation-delay: -2s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .edge {
+            stroke-dasharray: 5;
+            animation: dash 20s linear infinite;
+        }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: -100; }
+        }
+        
+        h3 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .instructions {
+            background: linear-gradient(135deg, #f0f4f8 0%, #e8eef3 100%);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(33, 150, 243, 0.2);
+        }
+        
+        .instructions h4 {
+            margin: 0 0 0.5rem 0;
+            color: #1976D2;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .instructions ol {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #555;
+            text-align: left;
+        }
+        
+        .instructions li {
+            margin: 0.5rem 0;
+        }
+        
+        .feature-badges {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: rgba(76, 175, 80, 0.1);
+            color: #2E7D32;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .footer {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .note {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-  <h2>Computation Graph Preview</h2>
-  <!--
-    This static SVG shows a sample graph for the expression:
-        r3 = (a + b) * (a - b)
-    Topic nodes are circles, Agent nodes are rectangles, and edges indicate data flow.
-  -->
-  <svg width="900" height="420" viewBox="0 0 900 420">
-    <!-- Arrowhead definition -->
-    <defs>
-      <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5"
-              orient="auto" markerUnits="strokeWidth">
-        <path d="M0,0 L10,5 L0,10 Z" fill="#555" />
-      </marker>
-    </defs>
-
-    <!-- TOPIC NODES -->
-    <circle class="topic" cx="70" cy="100" r="28" />
-    <text class="label" x="70" y="100">A</text>
-
-    <circle class="topic" cx="70" cy="260" r="28" />
-    <text class="label" x="70" y="260">B</text>
-
-    <!-- AGENT NODES -->
-    <rect class="agent" x="180" y="70" width="90" height="60" rx="10" ry="10" />
-    <text class="label" x="225" y="100">Plus</text>
-
-    <rect class="agent" x="180" y="230" width="90" height="60" rx="10" ry="10" />
-    <text class="label" x="225" y="260">Minus</text>
-
-    <!-- INTERMEDIATE TOPICS -->
-    <circle class="topic" cx="360" cy="100" r="28" />
-    <text class="label" x="360" y="100">R1</text>
-
-    <circle class="topic" cx="360" cy="260" r="28" />
-    <text class="label" x="360" y="260">R2</text>
-
-    <!-- MULTIPLY AGENT -->
-    <rect class="agent" x="500" y="150" width="90" height="60" rx="10" ry="10" />
-    <text class="label" x="545" y="180">Mul</text>
-
-    <!-- OUTPUT TOPIC -->
-    <circle class="topic" cx="700" cy="180" r="28" />
-    <text class="label" x="700" y="180">R3</text>
-
-    <!-- EDGES -->
-    <!-- A & B to Plus / Minus -->
-    <line class="edge" x1="98" y1="100" x2="180" y2="100" />
-    <line class="edge" x1="98" y1="260" x2="180" y2="260" />
-
-    <line class="edge" x1="225" y1="70" x2="225" y2="260" visibility="hidden" /> <!-- spacer -->
-
-    <!-- Plus & Minus to R1 / R2 -->
-    <line class="edge" x1="270" y1="100" x2="332" y2="100" />
-    <line class="edge" x1="270" y1="260" x2="332" y2="260" />
-
-    <!-- R1 & R2 to Mul -->
-    <line class="edge" x1="388" y1="100" x2="500" y2="180" />
-    <line class="edge" x1="388" y1="260" x2="500" y2="180" />
-
-    <!-- Mul to R3 -->
-    <line class="edge" x1="590" y1="180" x2="672" y2="180" />
-  </svg>
-
-  <p class="note">
-    This is a static mock‑up meant for quick visual validation (and a bring-up graph). 
-    The code will plug in <code>HtmlGraphWriter</code> to output this SVG dynamically from real graph data.
-  </p>
+    <div class="header">
+        <h2>Interactive Computation Graph</h2>
+        <div class="controls">
+            <button class="btn" disabled>Reset Layout</button>
+            <button class="btn" disabled>Center View</button>
+            <span class="info">Controls will be active after deployment</span>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="placeholder-content">
+            <div class="icon-container">
+                <svg class="graph-icon" viewBox="0 0 120 120">
+                    <!-- Animated graph visualization -->
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    
+                    <!-- Edges -->
+                    <line class="edge" x1="30" y1="30" x2="60" y2="60" stroke="#34495e" stroke-width="2" opacity="0.6"/>
+                    <line class="edge" x1="90" y1="30" x2="60" y2="60" stroke="#34495e" stroke-width="2" opacity="0.6"/>
+                    <line class="edge" x1="60" y1="60" x2="60" y2="90" stroke="#34495e" stroke-width="2" opacity="0.6"/>
+                    
+                    <!-- Nodes -->
+                    <circle class="node" cx="30" cy="30" r="15" fill="#4CAF50" stroke="#2E7D32" stroke-width="2" filter="url(#glow)"/>
+                    <circle class="node" cx="90" cy="30" r="15" fill="#4CAF50" stroke="#2E7D32" stroke-width="2" filter="url(#glow)"/>
+                    <rect class="node" x="45" y="45" width="30" height="30" rx="5" fill="#2196F3" stroke="#1565C0" stroke-width="2" filter="url(#glow)"/>
+                    <circle class="node" cx="60" cy="90" r="15" fill="#4CAF50" stroke="#2E7D32" stroke-width="2" filter="url(#glow)"/>
+                </svg>
+            </div>
+            
+            <h3>Ready to Visualize Your Graph</h3>
+            <p class="subtitle">
+                Upload a configuration file and deploy to see your computation graph come to life with interactive features
+            </p>
+            
+            <div class="instructions">
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"></path>
+                    </svg>
+                    Quick Start:
+                </h4>
+                <ol>
+                    <li>Create a configuration file with your agents and topics</li>
+                    <li>Upload the configuration file</li>
+                    <li>Click "Deploy" to generate your interactive graph</li>
+                    <li>Drag nodes, zoom, and explore your computation flow</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p class="note">
+            <strong>Computation Graph Visualizer</strong> • Green circles = topics, Blue rectangles = agents
+            <br>Experience the power of visual dataflow programming
+        </p>
+    </div>
 </body>
 </html>

@@ -3,7 +3,7 @@ package servlets;
 import server.RequestParser.RequestInfo;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,38 +25,49 @@ public class ConfLoader implements Servlet {
                 UploadFile upload = parseMultipartFile(body, contentType);
                 Path dir = Paths.get("config_files");
                 if (Files.notExists(dir)) {
-                Files.createDirectories(dir);
+                    Files.createDirectories(dir);
                 }
                 Path target = dir.resolve(upload.filename);
                 Files.write(target, upload.content);
                 System.out.println("File uploaded: " + upload.filename);
 
-
-                TopicManager tm=TopicManagerSingleton.get();
+                TopicManager tm = TopicManagerSingleton.get();
                 tm.clear();
 
-                GenericConfig gc=new GenericConfig();
-                gc.setConfFile("config_files/" + upload.filename); // change to the exact loaction where you put the file.
+                GenericConfig gc = new GenericConfig();
+                gc.setConfFile("config_files/" + upload.filename);
                 gc.create();  
                 System.out.println("Configuration created ");
-                Graph g=new Graph();
+                
+                Graph g = new Graph();
                 g.createFromTopics();
                 System.out.println("Graph nodes: " + g.size());
                 System.out.println("Graph created from topics");
+                
+                // Send HTTP headers first
                 String headers = "HTTP/1.1 200 OK\r\n"
                     + "Content-Type: text/html; charset=UTF-8\r\n"
                     + "Connection: close\r\n\r\n";
                 toClient.write(headers.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-
-                HtmlGraphWriter.write(g, new PrintWriter(toClient));
-
+                
+                // Use HtmlGraphWriter to write the graph HTML directly to the client
+                OutputStreamWriter writer = new OutputStreamWriter(toClient, java.nio.charset.StandardCharsets.UTF_8);
+                HtmlGraphWriter.write(g, writer);
+                writer.flush();
 
             } catch (Exception e) {
                 e.printStackTrace();
+                // Send error response
+                String errorHtml = "<html><body><h2>Error uploading file</h2><p>" + e.getMessage() + "</p></body></html>";
+                byte[] content = errorHtml.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                String headers = "HTTP/1.1 500 Internal Server Error\r\n"
+                    + "Content-Type: text/html; charset=UTF-8\r\n"
+                    + "Content-Length: " + content.length + "\r\n"
+                    + "Connection: close\r\n\r\n";
+                toClient.write(headers.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                toClient.write(content);
             }
         }
-
-      
     }
 
     @Override

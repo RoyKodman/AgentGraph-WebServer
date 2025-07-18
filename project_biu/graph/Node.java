@@ -7,17 +7,22 @@ public class Node {
     private String name;
     private List<Node> edges;
     private Message msg;
+    private Agent agent;
 
     // Constructor:name
     public Node(String name) {
         this.name = name;
         this.edges = new ArrayList<>();
     }
-
+    
     // Set functions:
     public void setName(String name) {
         this.name = name;
     }
+    
+    // Add getter/setter for agent
+    public Agent getAgent() { return agent; }
+    public void setAgent(Agent agent) { this.agent = agent; }
 
     public void setEdges(List<Node> edges) {
         this.edges = edges;
