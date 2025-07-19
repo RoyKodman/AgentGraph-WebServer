@@ -120,3 +120,15 @@ html_files/
 **Note:**  
 - All server logs are written to `project.log` in the project root.
 ---
+
+## Project Explanation Video
+
+Here is a [YouTube video](https://www.youtube.com/watch?v=iIf9PSMd-0g) of us, the developers, explaining the project and its features.
+
+https://www.youtube.com/watch?v=iIf9PSMd-0g
+---
+
+## Authors
+- Roy Kodman
+- Ori Maimon
+
