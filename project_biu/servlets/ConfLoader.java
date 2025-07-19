@@ -14,6 +14,18 @@ import graph.TopicManagerSingleton;
 import graph.TopicManagerSingleton.TopicManager;
 import views.HtmlGraphWriter;
 
+/**
+ * ConfLoader is a servlet that handles HTTP POST requests for uploading configuration files.
+ * <p>
+ * It processes multipart/form-data uploads, saves the configuration file, updates the topic manager,
+ * creates a new computation graph, and responds with an HTML visualization of the graph.
+ * </p>
+ * <h2>Usage</h2>
+ * Register this servlet for POST requests to a specific URI:
+ * <pre>{@code
+ * server.addServlet("POST", "/upload", new ConfLoader());
+ * }</pre>
+ */
 public class ConfLoader implements Servlet {
 
     @Override

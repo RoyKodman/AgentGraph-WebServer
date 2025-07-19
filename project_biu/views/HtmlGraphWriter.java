@@ -10,7 +10,16 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
-
+/**
+ * HtmlGraphWriter generates interactive HTML visualizations of computation graphs.
+ * <p>
+ * It provides static methods to write a full HTML document with SVG and JavaScript for visualizing nodes and edges.
+ * </p>
+ * <h2>Usage</h2>
+ * <pre>{@code
+ * HtmlGraphWriter.write(graph, writer);
+ * }</pre>
+ */
 public final class HtmlGraphWriter {
     /*Public API*/
 
@@ -102,9 +111,13 @@ public final class HtmlGraphWriter {
     }
 
     private static String getDisplayName(String nodeName) {
-        // Remove the "T" or "A" prefix from the label
         if (nodeName.startsWith("T") || nodeName.startsWith("A")) {
-            return nodeName.substring(1);
+            // Strip prefix and any suffix after an underscore
+            int start = 1;
+            int underscore = nodeName.indexOf('_', start);
+            return underscore == -1
+                  ? nodeName.substring(start)
+                  : nodeName.substring(start, underscore);
         }
         return nodeName;
     }

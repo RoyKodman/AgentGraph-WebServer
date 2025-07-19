@@ -7,6 +7,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * HtmlLoader is a servlet that serves static HTML files from a specified directory.
+ * <p>
+ * It handles HTTP GET requests, loads the requested HTML file, and returns it as the HTTP response.
+ * </p>
+ * <h2>Usage</h2>
+ * Register this servlet for GET requests to a URI prefix:
+ * <pre>{@code
+ * server.addServlet("GET", "/app/", new HtmlLoader("html_files"));
+ * }</pre>
+ */
 public class HtmlLoader implements Servlet {
     private String directory;
 

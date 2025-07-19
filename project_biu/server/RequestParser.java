@@ -7,6 +7,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * RequestParser provides static methods for parsing raw HTTP requests from an InputStream.
+ * <p>
+ * It extracts the HTTP method, URI, headers, parameters, and body, and returns a {@link RequestInfo} object.
+ * </p>
+ * <h2>Usage</h2>
+ * <pre>{@code
+ * RequestInfo info = RequestParser.parseRequest(inputStream);
+ * String method = info.getHttpCommand();
+ * String uri = info.getUri();
+ * }</pre>
+ */
 public class RequestParser {
 
     public static RequestInfo parseRequest(InputStream in) throws IOException {

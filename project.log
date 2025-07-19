@@ -1,1 +1,48 @@
 Server started on port 8080
+New client connected: /[0:0:0:0:0:0:0:1]:59435
+New client connected: /[0:0:0:0:0:0:0:1]:59436
+Handling client request...
+Handling client request...
+Requested file: index.html
+html_files/index.html
+Loading file: html_files/index.html
+New client connected: /[0:0:0:0:0:0:0:1]:59437
+Handling client request...
+Requested file: form.html
+html_files/form.html
+Loading file: html_files/form.html
+New client connected: /[0:0:0:0:0:0:0:1]:59438
+Handling client request...
+Requested file: graph.html
+html_files/graph.html
+Loading file: html_files/graph.html
+Requested file: temp.html
+html_files/temp.html
+Loading file: html_files/temp.html
+New client connected: /[0:0:0:0:0:0:0:1]:59442
+Handling client request...
+DEBUG: RequestParser read 272 bytes (should match Content-Length: 272)
+DEBUG: First 80 chars: ------WebKitFormBoundaryWU3nsqaR09aDKrxV
+Content-Disposition: form-data; name="
+servlets.ConfLoader@4351f468
+DEBUG: Boundary: [------WebKitFormBoundaryWU3nsqaR09aDKrxV]
+DEBUG: First 400 of bodyStr: [------WebKitFormBoundaryWU3nsqaR09aDKrxV
+Content-Disposition: form-data; name="configFile"; filename="ori.conf"
+Content-Type: application/octet-stream
+
+graph.PlusAgent
+A,B
+C
+graph.PlusAgent
+E,F
+G
+graph.IncAgent
+A
+D
+------WebKitFormBoundaryWU3nsqaR09aDKrxV--
+]
+File uploaded: ori.conf
+Configuration created 
+Graph nodes: 10
+Graph created from topics
+Graph nodes: 10

@@ -9,6 +9,17 @@ import graph.TopicManagerSingleton;
 import graph.TopicManagerSingleton.TopicManager;
 import graph.Message;
 
+/**
+ * TopicDisplayer is a servlet that handles HTTP GET requests for displaying and publishing messages to topics.
+ * <p>
+ * It allows clients to publish messages to a topic and view the latest values for all topics in an HTML table.
+ * </p>
+ * <h2>Usage</h2>
+ * Register this servlet for GET requests to a specific URI:
+ * <pre>{@code
+ * server.addServlet("GET", "/publish", new TopicDisplayer());
+ * }</pre>
+ */
 public class TopicDisplayer implements Servlet {
 
     @Override

@@ -18,6 +18,27 @@ import server.RequestParser.RequestInfo;
 
 import static server.RequestParser.parseRequest;
 
+/**
+ * MyHTTPServer is a simple, reusable multi-threaded HTTP server implementation.
+ * <p>
+ * It allows developers to register servlets for specific HTTP methods and URI prefixes.
+ * Each incoming request is dispatched to the appropriate servlet in a thread pool.
+ * </p>
+ * <h2>Usage Example</h2>
+ * <pre>{@code
+ * HTTPServer server = new MyHTTPServer(8080, 5);
+ * server.addServlet("GET", "/hello", new MyHelloServlet());
+ * server.start();
+ * // ...
+ * server.close();
+ * }</pre>
+ * <p>
+ * The server runs in its own thread. Use {@link #addServlet(String, String, Servlet)} to register handlers.
+ * </p>
+ *
+ * @see HTTPServer
+ * @see servlets.Servlet
+ */
 public class MyHTTPServer extends Thread implements HTTPServer{
     // Maps for HTTP method to URI to Servlet
     Map<String, Servlet> getMap, postMap, deleteMap;
@@ -28,6 +49,13 @@ public class MyHTTPServer extends Thread implements HTTPServer{
     // Main server socket
     ServerSocket serverSocket;
 
+    /**
+     * Constructs a new HTTP server listening on the given port, using a fixed thread pool.
+     *
+     * @param port     The TCP port to listen on (e.g., 8080)
+     * @param nThreads Number of worker threads for handling requests
+     * @throws IOException if the server socket cannot be created
+     */
     public MyHTTPServer(int port,int nThreads) throws IOException {
         // Initialize servlet maps and thread pool
         getMap = new ConcurrentHashMap<>();
@@ -38,7 +66,13 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         serverSocket = new ServerSocket(port);
     }
 
-    // Register a servlet for a specific HTTP method and URI
+    /**
+     * Register a servlet to handle a specific HTTP method and URI prefix.
+     *
+     * @param httpCommanmd HTTP method (e.g., "GET", "POST", "DELETE")
+     * @param uri URI prefix to match (e.g., "/api/")
+     * @param s   The servlet to handle matching requests
+     */
     public void addServlet(String httpCommanmd, String uri, Servlet s){
         switch (httpCommanmd) {
             case "GET":
@@ -55,7 +89,12 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     }
 
-    // Remove a servlet for a specific HTTP method and URI
+    /**
+     * Remove a servlet for a specific HTTP method and URI prefix.
+     *
+     * @param httpCommanmd HTTP method (e.g., "GET", "POST", "DELETE")
+     * @param uri URI prefix to remove
+     */
     public void removeServlet(String httpCommanmd, String uri){
         switch (httpCommanmd) {
             case "GET":
@@ -72,6 +111,12 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     }
 
+    /**
+     * Main server loop: accepts and handles client connections.
+     * <p>
+     * This method is called when the server thread is started. It should not be called directly.
+     * </p>
+     */
     @Override
     public void run() {
         run = true;
@@ -192,7 +237,12 @@ public class MyHTTPServer extends Thread implements HTTPServer{
         }
     } */
 
-    // Signal the server to stop
+    /**
+     * Signal the server to stop and release all resources.
+     * <p>
+     * After calling this method, the server will stop accepting new connections and shut down the thread pool.
+     * </p>
+     */
     public void close(){
         this.run = false;
         /*
